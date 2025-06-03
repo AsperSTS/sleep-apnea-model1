@@ -1,5 +1,5 @@
 *.joblib
-*.csv
+*.pyc
 visual_eda/
 visual_model/
 visual_preprocesado/

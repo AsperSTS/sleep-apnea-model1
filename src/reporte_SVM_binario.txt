@@ -21,9 +21,9 @@ weighted avg       0.72      0.72      0.72      3089
 
 ===== RESULTADOS CV (5-FOLD) =====
 
-Media: 0.7899
-Desviación estándar: 0.0067
-Min: 0.7840
+Media: 0.7901
+Desviación estándar: 0.0066
+Min: 0.7843
 Max: 0.8010
 
 ===== MÉTRICAS ADICIONALES =====
