@@ -1,0 +1,41 @@
+===== REPORTE DEL MODELO RandomForest (BINARIA) =====
+
+Accuracy: 0.7106
+Precision: 0.6908
+Recall: 0.7419
+F1 Score: 0.7155
+ROC AUC: 0.7742
+PR AUC: 0.7331
+
+===== REPORTE DE CLASIFICACIÓN =====
+
+              precision    recall  f1-score   support
+
+           0       0.73      0.68      0.71      1574
+           1       0.69      0.74      0.72      1515
+
+    accuracy                           0.71      3089
+   macro avg       0.71      0.71      0.71      3089
+weighted avg       0.71      0.71      0.71      3089
+
+
+===== RESULTADOS CV (5-FOLD) =====
+
+Media: 0.7555
+Desviación estándar: 0.0065
+Min: 0.7479
+Max: 0.7675
+
+
+===== IMPORTANCIA DE CARACTERÍSTICAS (Top 10) =====
+
+1. Característica 0: 0.3875
+2. Característica 11: 0.1005
+3. Característica 2: 0.0969
+4. Característica 1: 0.0864
+5. Característica 3: 0.0576
+6. Característica 4: 0.0529
+7. Característica 12: 0.0515
+8. Característica 7: 0.0257
+9. Característica 9: 0.0240
+10. Característica 13: 0.0215

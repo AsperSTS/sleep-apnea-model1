@@ -1,2 +1,12 @@
 *.joblib
 *.csv
+visual_eda/
+visual_model/
+visual_preprocesado/
+train_test/
+test/
+papers/
+old/
+data/
+old_data/
+modelos/
