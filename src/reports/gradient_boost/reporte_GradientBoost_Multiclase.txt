@@ -1,0 +1,28 @@
+===== REPORTE DEL MODELO GradientBoost_Multiclase =====
+
+Accuracy: 0.4372
+Precision: 0.4179
+Recall: 0.4218
+F1 Score: 0.4189
+ROC AUC: 0.7032
+
+===== REPORTE DE CLASIFICACIÓN =====
+
+              precision    recall  f1-score   support
+
+           0       0.60      0.63      0.61       386
+           1       0.33      0.33      0.33       331
+           2       0.32      0.26      0.29       265
+           3       0.43      0.46      0.45       260
+
+    accuracy                           0.44      1242
+   macro avg       0.42      0.42      0.42      1242
+weighted avg       0.43      0.44      0.43      1242
+
+
+===== RESULTADOS CV (5-FOLD) =====
+
+Media: 0.4491
+Desviación estándar: 0.0134
+Min: 0.4255
+Max: 0.4638

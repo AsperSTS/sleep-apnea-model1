@@ -75,11 +75,11 @@ def Preprocessing(df, estrategia_imputation='knn'):
         imputer = SimpleImputer(strategy=estrategia_imputation)
         df_procesado[variables_numericas] = imputer.fit_transform(df_procesado[variables_numericas])
     
-    # Imputación para variables categóricas (moda)
-    for var in variables_categoricas:
-        if var in df_procesado.columns and df_procesado[var].isnull().sum() > 0:
-            moda = df_procesado[var].mode()[0]
-            df_procesado.loc[:, var] = df_procesado[var].fillna(moda)
+    # # Imputación para variables categóricas (moda)
+    # for var in variables_categoricas:
+    #     if var in df_procesado.columns and df_procesado[var].isnull().sum() > 0:
+    #         moda = df_procesado[var].mode()[0]
+    #         df_procesado.loc[:, var] = df_procesado[var].fillna(moda)
     
     # 3. Detección y tratamiento de outliers MEJORADO (más conservador)
     print("Detectando y tratando outliers con método más conservador...")
@@ -186,7 +186,6 @@ def Preprocessing(df, estrategia_imputation='knn'):
         risk_factors.append('hipertension')
     if 'nsrr_current_smoker' in df_procesado.columns:
         risk_factors.append('nsrr_current_smoker')
-    
     if risk_factors:
         df_procesado['clinical_risk_score'] = df_procesado[risk_factors].sum(axis=1)
     

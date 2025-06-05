@@ -62,10 +62,10 @@ def train_model(processed_data, models: list, modo: str) -> None:
         model = GradientBoost()
         if modo == "binario":
             results = model.train_gb_binary(X, y)
-            model.visualizar_resultados_gb_binario(results, nombre_modelo="GB Binario")
+            model.visualizar_resultados_gb_binario(results, nombre_modelo="GradientBoost_Binario")
         else:  # multiclase
             results = model.train_gb_multiclase(X, y)
-            model.visualizar_resultados_gb_multiclase(results, nombre_modelo="GB Multiclase")
+            model.visualizar_resultados_gb_multiclase(results, nombre_modelo="GradientBoost_Multiclase")
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='Entrenamiento de modelo para apnea del sueño')

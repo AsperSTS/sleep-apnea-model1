@@ -1,0 +1,42 @@
+===== REPORTE DEL MODELO RandomForest (MULTICLASE) =====
+
+Accuracy: 0.4058
+Precision: 0.3869
+Recall: 0.3907
+F1 Score: 0.3880
+ROC AUC: 0.6643
+
+===== REPORTE DE CLASIFICACIÓN =====
+
+              precision    recall  f1-score   support
+
+           0       0.54      0.59      0.56       386
+           1       0.32      0.32      0.32       331
+           2       0.28      0.23      0.25       265
+           3       0.41      0.42      0.42       260
+
+    accuracy                           0.41      1242
+   macro avg       0.39      0.39      0.39      1242
+weighted avg       0.40      0.41      0.40      1242
+
+
+===== RESULTADOS CV (5-FOLD) =====
+
+Media: 0.4077
+Desviación estándar: 0.0073
+Min: 0.3973
+Max: 0.4203
+
+
+===== IMPORTANCIA DE CARACTERÍSTICAS (Top 10) =====
+
+1. Característica 2: 0.2241
+2. Característica 0: 0.2147
+3. Característica 3: 0.1828
+4. Característica 4: 0.1788
+5. Característica 6: 0.0306
+6. Característica 1: 0.0263
+7. Característica 12: 0.0189
+8. Característica 13: 0.0189
+9. Característica 11: 0.0138
+10. Característica 22: 0.0124

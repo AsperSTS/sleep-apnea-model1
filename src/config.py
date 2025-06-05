@@ -4,11 +4,13 @@ Archivo de configuración con constantes y parámetros del modelo
 import os
 
 # Informacion de los datasets
-DATA_PATH = "shhs_hchs_33_25_21_21.csv" # "shhs_hchs.csv"
+BINARY_DATA_PATH = "shhs_hchs_33_25_21_21.csv" # Este dataset da mejores resultados con datos binarios
+
+DATA_PATH = "shhs_hchs.csv" # "shhs_hchs.csv"
 VARIABLES_TO_EXCLUDE = ['nsrr_ethnicity', 'nsrr_race']
 
-# Modelos a entrenar
-MODELS_TO_TRAIN = ["SVM", "RandomForest","GradientBoost"]
+# Modelos a entrenar -> ["SVM", "RandomForest","GradientBoost"]
+MODELS_TO_TRAIN = ["SVM","RandomForest","GradientBoost",]
 
 # Carpetas de resultados
 VISUAL_EDA_DIR = "visual_eda"
@@ -19,7 +21,7 @@ TRAIN_TEST_DATA_DIR = "train_test"
 # Rutas de reportes
 REPORTS_BASE_DIR = "reports"
 SVM_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "svm")
-GB_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "gradient_boosting")
+GB_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "gradient_boost")
 RF_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "random_forest")
 EDA_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "eda")
 PREPROCESSING_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "preprocessing")

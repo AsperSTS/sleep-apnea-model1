@@ -315,7 +315,7 @@ class GradientBoost:
             print("El modelo no ha sido entrenado aún.")
             return None
 
-    def visualizar_resultados_gb_binario(self, resultados, nombre_modelo='GradientBoost_Binary'):
+    def visualizar_resultados_gb_binario(self, resultados, nombre_modelo='GB_Binary'):
         """
         Visualiza los resultados del modelo Gradient Boosting binario.
         
@@ -324,11 +324,11 @@ class GradientBoost:
             nombre_modelo: Nombre del modelo para usar en los archivos guardados
         """
         # Crear directorio para visualizaciones si no existe
-        if not os.path.exists('visual_model'):
-            os.makedirs('visual_model')
+        if not os.path.exists(f'{GB_REPORTS_PATH}'):
+            os.makedirs(f'{GB_REPORTS_PATH}')
         
         # Obtener datos de prueba
-        X_test_scaled, y_test, y_pred, y_prob = resultados['test_data']
+        X_test, y_test, y_pred, y_prob = resultados['test_data']
         
         # 1. Métricas del modelo en gráfico de barras
         plt.figure(figsize=(12, 6))
@@ -342,7 +342,7 @@ class GradientBoost:
             plt.text(i, v + 0.02, f'{v:.3f}', ha='center')
         plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig(f'visual_model/metricas_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/metricas_{nombre_modelo}.png')
         plt.close()
         
         # 2. Matriz de confusión
@@ -353,7 +353,7 @@ class GradientBoost:
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clases)
         disp.plot(cmap='Blues', values_format='d', ax=plt.gca())
         plt.title(f'Matriz de Confusión - {nombre_modelo}')
-        plt.savefig(f'visual_model/matriz_confusion_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/matriz_confusion_{nombre_modelo}.png')
         plt.close()
         
         # 3. Curva ROC
@@ -368,7 +368,7 @@ class GradientBoost:
         plt.ylabel('Tasa de Verdaderos Positivos')
         plt.title(f'Curva ROC - {nombre_modelo}')
         plt.legend(loc="lower right")
-        plt.savefig(f'visual_model/curva_roc_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/curva_roc_{nombre_modelo}.png')
         plt.close()
         
         # 4. Curva Precision-Recall
@@ -380,7 +380,7 @@ class GradientBoost:
         plt.ylabel('Precision')
         plt.title(f'Curva Precision-Recall - {nombre_modelo}')
         plt.legend()
-        plt.savefig(f'visual_model/curva_pr_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/curva_pr_{nombre_modelo}.png')
         plt.close()
         
         # 5. Distribución de probabilidades
@@ -394,7 +394,7 @@ class GradientBoost:
         plt.ylabel('Densidad')
         plt.title(f'Distribución de probabilidades por clase - {nombre_modelo}')
         plt.legend()
-        plt.savefig(f'visual_model/distribucion_probabilidades_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/distribucion_probabilidades_{nombre_modelo}.png')
         plt.close()
         
         # 6. Validación cruzada
@@ -406,7 +406,7 @@ class GradientBoost:
         plt.axhline(y=np.mean(cv_scores), color='r', linestyle='--', 
                     label=f'Media: {np.mean(cv_scores):.3f}')
         plt.text(1.1, np.mean(cv_scores), f'{np.mean(cv_scores):.3f}', color='r')
-        plt.savefig(f'visual_model/cv_scores_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/cv_scores_{nombre_modelo}.png')
         plt.close()
         
         # 7. Importancia de características
@@ -421,11 +421,11 @@ class GradientBoost:
             plt.title(f'Top 15 Características más importantes - {nombre_modelo}')
             plt.gca().invert_yaxis()
             plt.tight_layout()
-            plt.savefig(f'visual_model/importancia_caracteristicas_{nombre_modelo}.png')
+            plt.savefig(f'{GB_REPORTS_PATH}/importancia_caracteristicas_{nombre_modelo}.png')
             plt.close()
         
         # 8. Resumen del clasificador
-        with open(f'reporte_{nombre_modelo}.txt', 'w') as f:
+        with open(f'{GB_REPORTS_PATH}/_{nombre_modelo}.txt', 'w') as f:
             f.write(f"===== REPORTE DEL MODELO {nombre_modelo} =====\n\n")
             f.write(f"Accuracy: {resultados['accuracy']:.4f}\n")
             f.write(f"Precision: {resultados['precision']:.4f}\n")
@@ -441,10 +441,10 @@ class GradientBoost:
             f.write(f"Min: {np.min(resultados['cv_scores']):.4f}\n")
             f.write(f"Max: {np.max(resultados['cv_scores']):.4f}\n")
         
-        print(f"Visualizaciones guardadas en el directorio 'visual_model/'")
+        print(f"Visualizaciones guardadas en el directorio '{GB_REPORTS_PATH}/'")
         return nombre_modelo
 
-    def visualizar_resultados_gb_multiclase(self, resultados, nombre_modelo='GradientBoost_Multiclass'):
+    def visualizar_resultados_gb_multiclase(self, resultados, nombre_modelo='GB_Multiclass'):
         """
         Visualiza los resultados del modelo Gradient Boosting multiclase.
         
@@ -453,11 +453,13 @@ class GradientBoost:
             nombre_modelo: Nombre del modelo para usar en los archivos guardados
         """
         # Crear directorio para visualizaciones si no existe
-        if not os.path.exists('visual_model'):
-            os.makedirs('visual_model')
+        if not os.path.exists(f'{GB_REPORTS_PATH}'):
+            os.makedirs(f'{GB_REPORTS_PATH}')
         
         # Obtener datos de prueba
-        X_test_scaled, y_test, y_pred, y_prob = resultados['test_data']
+        X_test, y_test, y_pred, y_prob = resultados['test_data']
+        # Asegurarse de que X_test es un array NumPy
+        X_test = X_test.values if isinstance(X_test, pd.DataFrame) else X_test
         
         # 1. Métricas del modelo en gráfico de barras
         plt.figure(figsize=(12, 6))
@@ -471,7 +473,7 @@ class GradientBoost:
             plt.text(i, v + 0.02, f'{v:.3f}', ha='center')
         plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig(f'visual_model/metricas_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/metricas_{nombre_modelo}.png')
         plt.close()
         
         # 2. Matriz de confusión
@@ -482,7 +484,7 @@ class GradientBoost:
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clases)
         disp.plot(cmap='Blues', values_format='d', ax=plt.gca())
         plt.title(f'Matriz de Confusión - {nombre_modelo}')
-        plt.savefig(f'visual_model/matriz_confusion_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/matriz_confusion_{nombre_modelo}.png')
         plt.close()
         
         # 3. Distribución de probabilidades por clase
@@ -503,7 +505,7 @@ class GradientBoost:
             plt.legend()
         
         plt.tight_layout()
-        plt.savefig(f'visual_model/distribucion_probabilidades_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/distribucion_probabilidades_{nombre_modelo}.png')
         plt.close()
         
         # 4. Validación cruzada
@@ -515,7 +517,7 @@ class GradientBoost:
         plt.axhline(y=np.mean(cv_scores), color='r', linestyle='--', 
                     label=f'Media: {np.mean(cv_scores):.3f}')
         plt.text(1.1, np.mean(cv_scores), f'{np.mean(cv_scores):.3f}', color='r')
-        plt.savefig(f'visual_model/cv_scores_{nombre_modelo}.png')
+        plt.savefig(f'{GB_REPORTS_PATH}/cv_scores_{nombre_modelo}.png')
         plt.close()
         
         # 5. Importancia de características
@@ -530,7 +532,7 @@ class GradientBoost:
             plt.title(f'Top 15 Características más importantes - {nombre_modelo}')
             plt.gca().invert_yaxis()
             plt.tight_layout()
-            plt.savefig(f'visual_model/importancia_caracteristicas_{nombre_modelo}.png')
+            plt.savefig(f'{GB_REPORTS_PATH}/importancia_caracteristicas_{nombre_modelo}.png')
             plt.close()
         
         # 6. Visualización de clasificación por pares de características importantes
@@ -548,15 +550,15 @@ class GradientBoost:
                 for i, (idx1, idx2) in enumerate(pairs[:3]):  # Limitar a 3 gráficos
                     plt.figure(figsize=(10, 8))
                     
-                    scatter = plt.scatter(X_test_scaled[:, idx1], X_test_scaled[:, idx2], 
+                    scatter = plt.scatter(X_test[:, idx1], X_test[:, idx2], 
                                         c=y_test, cmap='viridis', alpha=0.7, 
                                         edgecolors='w', s=100)
                     
                     # Añadir predicciones incorrectas marcadas con X
                     mask_incorrect = y_test != y_pred
                     if np.any(mask_incorrect):
-                        plt.scatter(X_test_scaled[mask_incorrect, idx1], 
-                                X_test_scaled[mask_incorrect, idx2],
+                        plt.scatter(X_test[mask_incorrect, idx1], 
+                                X_test[mask_incorrect, idx2],
                                 marker='x', c='red', s=150, linewidths=2, 
                                 label='Predicciones incorrectas')
                     
@@ -565,11 +567,11 @@ class GradientBoost:
                     plt.xlabel(f'Característica {idx1}')
                     plt.ylabel(f'Característica {idx2}')
                     plt.legend()
-                    plt.savefig(f'visual_model/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}.png')
+                    plt.savefig(f'{GB_REPORTS_PATH}/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}.png')
                     plt.close()
         
         # 7. Resumen del clasificador
-        with open(f'visual_model/reporte_{nombre_modelo}.txt', 'w') as f:
+        with open(f'{GB_REPORTS_PATH}/reporte_{nombre_modelo}.txt', 'w') as f:
             f.write(f"===== REPORTE DEL MODELO {nombre_modelo} =====\n\n")
             f.write(f"Accuracy: {resultados['accuracy']:.4f}\n")
             f.write(f"Precision: {resultados['precision']:.4f}\n")
@@ -584,5 +586,5 @@ class GradientBoost:
             f.write(f"Min: {np.min(resultados['cv_scores']):.4f}\n")
             f.write(f"Max: {np.max(resultados['cv_scores']):.4f}\n")
         
-        print(f"Visualizaciones guardadas en el directorio 'visual_model/'")
+        print(f"Visualizaciones guardadas en el directorio '{GB_REPORTS_PATH}/'")
         return nombre_modelo

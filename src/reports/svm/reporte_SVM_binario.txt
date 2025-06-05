@@ -1,36 +1,36 @@
 ===== REPORTE DEL MODELO SVM_binario =====
 
-Accuracy: 0.7797
-Precision: 0.7671
-Recall: 0.8032
-F1 Score: 0.7848
-ROC AUC: 0.8541
-PR AUC: 0.8466
+Accuracy: 0.7815
+Precision: 0.7639
+Recall: 0.8148
+F1 Score: 0.7885
+ROC AUC: 0.8610
+PR AUC: 0.8403
 
 ===== REPORTE DE CLASIFICACIÓN =====
 
               precision    recall  f1-score   support
 
-           0       0.79      0.76      0.77       808
-           1       0.77      0.80      0.78       808
+           0       0.80      0.75      0.77       810
+           1       0.76      0.81      0.79       810
 
-    accuracy                           0.78      1616
-   macro avg       0.78      0.78      0.78      1616
-weighted avg       0.78      0.78      0.78      1616
+    accuracy                           0.78      1620
+   macro avg       0.78      0.78      0.78      1620
+weighted avg       0.78      0.78      0.78      1620
 
 
 ===== RESULTADOS CV (5-FOLD) =====
 
-Media: 0.8619
-Desviación estándar: 0.0100
-Min: 0.8476
-Max: 0.8750
+Media: 0.8635
+Desviación estándar: 0.0087
+Min: 0.8538
+Max: 0.8799
 
 ===== MÉTRICAS ADICIONALES =====
 
-Especificidad: 0.7562
-Valor Predictivo Negativo: 0.7935
-Verdaderos Negativos: 611
-Falsos Positivos: 197
-Falsos Negativos: 159
-Verdaderos Positivos: 649
+Especificidad: 0.7481
+Valor Predictivo Negativo: 0.8016
+Verdaderos Negativos: 606
+Falsos Positivos: 204
+Falsos Negativos: 150
+Verdaderos Positivos: 660

@@ -267,8 +267,8 @@ class RandomForest:
         """
 
         # Crear directorio para visualizaciones si no existe
-        if not os.path.exists('visual_model'):
-            os.makedirs('visual_model')
+        if not os.path.exists(f'{RF_REPORTS_PATH}'):
+            os.makedirs(f'{RF_REPORTS_PATH}')
         
         # Obtener datos de prueba
         X_test_scaled, y_test, y_pred, y_prob = resultados['test_data']
@@ -292,7 +292,7 @@ class RandomForest:
             plt.text(i, v + 0.02, f'{v:.3f}', ha='center')
         plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig(f'visual_model/metricas_{nombre_modelo}_{tipo_clasificacion}.png')
+        plt.savefig(f'{RF_REPORTS_PATH}/metricas_{nombre_modelo}_{tipo_clasificacion}.png')
         plt.close()
         
         # 2. Matriz de confusión
@@ -305,7 +305,7 @@ class RandomForest:
         disp.plot(cmap='Blues', values_format='d', ax=plt.gca())
         plt.title(f'Matriz de Confusión - {nombre_modelo} ({tipo_clasificacion.capitalize()})')
         plt.tight_layout()
-        plt.savefig(f'visual_model/matriz_confusion_{nombre_modelo}_{tipo_clasificacion}.png')
+        plt.savefig(f'{RF_REPORTS_PATH}/matriz_confusion_{nombre_modelo}_{tipo_clasificacion}.png')
         plt.close()
         
         # 3. Distribución de probabilidades
@@ -324,7 +324,7 @@ class RandomForest:
             plt.ylabel('Densidad')
             plt.legend()
             plt.tight_layout()
-            plt.savefig(f'visual_model/distribucion_probabilidades_{nombre_modelo}_{tipo_clasificacion}.png')
+            plt.savefig(f'{RF_REPORTS_PATH}/distribucion_probabilidades_{nombre_modelo}_{tipo_clasificacion}.png')
             plt.close()
             
         else:
@@ -346,7 +346,7 @@ class RandomForest:
                 plt.legend()
             
             plt.tight_layout()
-            plt.savefig(f'visual_model/distribucion_probabilidades_{nombre_modelo}_{tipo_clasificacion}.png')
+            plt.savefig(f'{RF_REPORTS_PATH}/distribucion_probabilidades_{nombre_modelo}_{tipo_clasificacion}.png')
             plt.close()
         
         # 4. Validación cruzada
@@ -360,7 +360,7 @@ class RandomForest:
         plt.text(1.1, np.mean(cv_scores), f'{np.mean(cv_scores):.3f}', color='r')
         plt.legend()
         plt.tight_layout()
-        plt.savefig(f'visual_model/cv_scores_{nombre_modelo}_{tipo_clasificacion}.png')
+        plt.savefig(f'{RF_REPORTS_PATH}/cv_scores_{nombre_modelo}_{tipo_clasificacion}.png')
         plt.close()
         
         # 5. Importancia de características (específico de Random Forest)
@@ -379,7 +379,7 @@ class RandomForest:
             plt.ylabel('Importancia')
             plt.xticks(range(top_n), [f'Feat_{indices[i]}' for i in range(top_n)], rotation=45)
             plt.tight_layout()
-            plt.savefig(f'visual_model/importancia_caracteristicas_{nombre_modelo}_{tipo_clasificacion}.png')
+            plt.savefig(f'{RF_REPORTS_PATH}/importancia_caracteristicas_{nombre_modelo}_{tipo_clasificacion}.png')
             plt.close()
             
             # Visualización de características más importantes en scatter plot (solo las top 5)
@@ -420,7 +420,7 @@ class RandomForest:
             #             if np.any(mask_incorrect):
             #                 plt.legend()
             #             plt.tight_layout()
-            #             plt.savefig(f'visual_model/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}_{tipo_clasificacion}.png')
+            #             plt.savefig(f'{RF_REPORTS_PATH}/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}_{tipo_clasificacion}.png')
             #             plt.close()
         
         # 6. Curvas ROC y PR (solo para clasificación binaria)
@@ -454,11 +454,11 @@ class RandomForest:
                 plt.legend(loc="lower left")
             
             plt.tight_layout()
-            plt.savefig(f'visual_model/curvas_roc_pr_{nombre_modelo}_{tipo_clasificacion}.png')
+            plt.savefig(f'{RF_REPORTS_PATH}/curvas_roc_pr_{nombre_modelo}_{tipo_clasificacion}.png')
             plt.close()
         
         # 7. Resumen del clasificador
-        with open(f'reporte_{nombre_modelo}_{tipo_clasificacion}.txt', 'w') as f:
+        with open(f'{RF_REPORTS_PATH}/{nombre_modelo}_{tipo_clasificacion}.txt', 'w') as f:
             f.write(f"===== REPORTE DEL MODELO {nombre_modelo} ({tipo_clasificacion.upper()}) =====\n\n")
             f.write(f"Accuracy: {resultados['accuracy']:.4f}\n")
             f.write(f"Precision: {resultados['precision']:.4f}\n")
@@ -485,5 +485,5 @@ class RandomForest:
                 for i in range(min(10, len(importances))):
                     f.write(f"{i+1}. Característica {indices[i]}: {importances[indices[i]]:.4f}\n")
         
-        print(f"Visualizaciones guardadas en el directorio 'visual_model/' para {nombre_modelo} ({tipo_clasificacion})")
+        print(f"Visualizaciones guardadas en el directorio '{RF_REPORTS_PATH}/' para {nombre_modelo} ({tipo_clasificacion})")
         return nombre_modelo

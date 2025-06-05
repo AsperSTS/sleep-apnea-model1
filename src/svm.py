@@ -407,8 +407,8 @@ class SVM:
 
         
         # Crear directorio para visualizaciones si no existe
-        if not os.path.exists(f'{VISUAL_MODEL_DIR}'):
-            os.makedirs(f'{VISUAL_MODEL_DIR}')
+        if not os.path.exists(f'{SVM_REPORTS_PATH}'):
+            os.makedirs(f'{SVM_REPORTS_PATH}')
         
         # Obtener datos de prueba
         X_test_scaled, y_test, y_pred, y_prob = resultados['test_data']
@@ -431,7 +431,7 @@ class SVM:
         
         plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig(f'{VISUAL_MODEL_DIR}/metricas_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{SVM_REPORTS_PATH}/metricas_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
         plt.close()
         
         # 2. Matriz de confusión
@@ -443,7 +443,7 @@ class SVM:
         disp.plot(cmap='Blues', values_format='d', ax=plt.gca())
         plt.title(f'Matriz de Confusión - {nombre_modelo}', fontsize=14, fontweight='bold')
         plt.tight_layout()
-        plt.savefig(f'{VISUAL_MODEL_DIR}/matriz_confusion_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{SVM_REPORTS_PATH}/matriz_confusion_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
         plt.close()
         
         # 3. Curva ROC
@@ -462,7 +462,7 @@ class SVM:
         plt.legend(loc="lower right")
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        plt.savefig(f'{VISUAL_MODEL_DIR}/curva_roc_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{SVM_REPORTS_PATH}/curva_roc_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
         plt.close()
         
         # 4. Curva Precision-Recall
@@ -478,7 +478,7 @@ class SVM:
         plt.legend(loc="lower left")
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        plt.savefig(f'{VISUAL_MODEL_DIR}/curva_pr_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{SVM_REPORTS_PATH}/curva_pr_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
         plt.close()
         
         # 5. Distribución de probabilidades
@@ -499,7 +499,7 @@ class SVM:
         plt.legend()
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        plt.savefig(f'{VISUAL_MODEL_DIR}/distribucion_probabilidades_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{SVM_REPORTS_PATH}/distribucion_probabilidades_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
         plt.close()
         
         # 6. Validación cruzada
@@ -517,7 +517,7 @@ class SVM:
         plt.legend()
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        plt.savefig(f'{VISUAL_MODEL_DIR}/cv_scores_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{SVM_REPORTS_PATH}/cv_scores_{nombre_modelo}.png', dpi=300, bbox_inches='tight')
         plt.close()
         
         # # 7. Visualización de clasificación por pares de características (si hay coeficientes)
@@ -557,7 +557,7 @@ class SVM:
         #                 plt.legend()
         #             plt.grid(True, alpha=0.3)
         #             plt.tight_layout()
-        #             plt.savefig(f'{VISUAL_MODEL_DIR}/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}.png', 
+        #             plt.savefig(f'{SVM_REPORTS_PATH}/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}.png', 
         #                     dpi=300, bbox_inches='tight')
         #             plt.close()
         
@@ -592,7 +592,7 @@ class SVM:
             f.write(f"Falsos Negativos: {fn}\n")
             f.write(f"Verdaderos Positivos: {tp}\n")
         
-        # print(f"Visualizaciones guardadas en el directorio '{VISUAL_MODEL_DIR}/'")
+        # print(f"Visualizaciones guardadas en el directorio '{SVM_REPORTS_PATH}/'")
         return nombre_modelo         
         
     def visualizar_resultados_multiclase(self, resultados, nombre_modelo='SVM_multiclase'):    
@@ -606,8 +606,8 @@ class SVM:
         """
 
         # Crear directorio para visualizaciones si no existe
-        if not os.path.exists('{VISUAL_MODEL_DIR}'):
-            os.makedirs('{VISUAL_MODEL_DIR}')
+        if not os.path.exists(f'{SVM_REPORTS_PATH}'):
+            os.makedirs(f'{SVM_REPORTS_PATH}')
         
         # Obtener datos de prueba
         X_test_scaled, y_test, y_pred, y_prob = resultados['test_data']
@@ -622,7 +622,7 @@ class SVM:
         plt.ylim(0, 1)
         for i, v in enumerate(valores):
             plt.text(i, v + 0.02, f'{v:.3f}', ha='center')
-        plt.savefig(f'{VISUAL_MODEL_DIR}/metricas_{nombre_modelo}.png')
+        plt.savefig(f'{SVM_REPORTS_PATH}/metricas_{nombre_modelo}.png')
         plt.close()
         
         # 2. Matriz de confusión
@@ -634,7 +634,7 @@ class SVM:
                                     display_labels=clases)
         disp.plot(cmap='Blues', values_format='d', ax=plt.gca())
         plt.title(f'Matriz de Confusión - {nombre_modelo}')
-        plt.savefig(f'{VISUAL_MODEL_DIR}/matriz_confusion_{nombre_modelo}.png')
+        plt.savefig(f'{SVM_REPORTS_PATH}/matriz_confusion_{nombre_modelo}.png')
         plt.close()
         
         # 3. Distribución de probabilidades por clase
@@ -655,7 +655,7 @@ class SVM:
             plt.legend()
         
         plt.tight_layout()
-        plt.savefig(f'{VISUAL_MODEL_DIR}/distribucion_probabilidades_{nombre_modelo}.png')
+        plt.savefig(f'{SVM_REPORTS_PATH}/distribucion_probabilidades_{nombre_modelo}.png')
         plt.close()
         
         # 4. Validación cruzada
@@ -667,7 +667,7 @@ class SVM:
         plt.axhline(y=np.mean(cv_scores), color='r', linestyle='--', 
                     label=f'Media: {np.mean(cv_scores):.3f}')
         plt.text(1.1, np.mean(cv_scores), f'{np.mean(cv_scores):.3f}', color='r')
-        plt.savefig(f'{VISUAL_MODEL_DIR}/cv_scores_{nombre_modelo}.png')
+        plt.savefig(f'{SVM_REPORTS_PATH}/cv_scores_{nombre_modelo}.png')
         plt.close()
         
         # # 5. Visualización de clasificación por pares de características (si hay coeficientes)
@@ -708,7 +708,7 @@ class SVM:
         #             plt.xlabel(f'Característica {idx1}')
         #             plt.ylabel(f'Característica {idx2}')
         #             plt.legend()
-        #             plt.savefig(f'{VISUAL_MODEL_DIR}/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}.png')
+        #             plt.savefig(f'{SVM_REPORTS_PATH}/dispersion_caracteristicas_{idx1}_{idx2}_{nombre_modelo}.png')
         #             plt.close()
         
         # 6. Resumen del clasificador
@@ -727,7 +727,7 @@ class SVM:
             f.write(f"Min: {np.min(resultados['cv_scores']):.4f}\n")
             f.write(f"Max: {np.max(resultados['cv_scores']):.4f}\n")
         
-        print(f"Visualizaciones guardadas en el directorio '{VISUAL_MODEL_DIR}/'")
+        print(f"Visualizaciones guardadas en el directorio '{SVM_REPORTS_PATH}/'")
         return nombre_modelo
     
     def find_best_parameters_binary(self, X, y, n_iter=50, cv_folds=5, scoring='recall'):
