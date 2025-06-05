@@ -4,7 +4,7 @@ Módulo para realizar predicciones con el modelo entrenado
 import pandas as pd
 import numpy as np
 import argparse
-from utils import cargar_modelo, cargar_datos
+from utils import cargar_modelo, load_data
 from config import *
 
 def predecir_apnea(modelo, datos):

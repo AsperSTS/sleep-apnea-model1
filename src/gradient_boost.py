@@ -56,14 +56,13 @@ class GradientBoost:
             'max_features': ['sqrt', 'log2', None, 0.3, 0.5, 0.7]
         }
                       
-    def train_gb_binary(self, X, y, balance_method='combined'):  
+    def train_gb_binary(self, X, y):  
         """
         Entrena el modelo de clasificación Gradient Boosting con opciones para manejar desbalance de clases.
         
         Args:
             X: Features
             y: Variable objetivo
-            balance_method: None, 'smote', 'undersample', o 'combined'
             
         Returns:
             Diccionario con resultados del entrenamiento
@@ -75,37 +74,12 @@ class GradientBoost:
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        # Aplicar técnicas de balanceo si se especifica
-        if balance_method:
-            if balance_method == 'smote':
-                from imblearn.over_sampling import SMOTE
-                print("Aplicando SMOTE para balancear clases...")
-                smote = SMOTE(random_state=42)
-                X_train, y_train = smote.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'undersample':
-                from imblearn.under_sampling import RandomUnderSampler
-                print("Aplicando RandomUnderSampler para balancear clases...")
-                rus = RandomUnderSampler(random_state=42)
-                X_train, y_train = rus.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'combined':
-                from imblearn.combine import SMOTEENN
-                print("Aplicando SMOTEENN (combinación de SMOTE y ENN)...")
-                smoteenn = SMOTEENN(random_state=42)
-                X_train, y_train = smoteenn.fit_resample(X_train, y_train)
-        
-        # Gradient Boosting puede beneficiarse de la estandarización
-        scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
-        
         # Entrenamiento del modelo
-        self.gb_classifier.fit(X_train_scaled, y_train)
+        self.gb_classifier.fit(X_train, y_train)
         
         # Evaluación
-        y_pred = self.gb_classifier.predict(X_test_scaled)
-        y_prob = self.gb_classifier.predict_proba(X_test_scaled)[:, 1]
+        y_pred = self.gb_classifier.predict(X_test)
+        y_prob = self.gb_classifier.predict_proba(X_test)[:, 1]
         
         # Validación cruzada
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -131,21 +105,21 @@ class GradientBoost:
             'pr_auc': pr_auc,
             'classification_report': classification_report(y_test, y_pred),
             'confusion_matrix': confusion_matrix(y_test, y_pred),
-            'test_data': (X_test_scaled, y_test, y_pred, y_prob),
-            'scaler': scaler,
+            'test_data': (X_test, y_test, y_pred, y_prob),
+            # 'scaler': scaler,
             'roc_curve': (fpr, tpr),
             'pr_curve': (precision, recall),
             'feature_importance': self.gb_classifier.feature_importances_
         }
     
-    def train_gb_multiclase(self, X, y, balance_method='None'):  
+    def train_gb_multiclase(self, X, y):  
         """
         Entrena el modelo de clasificación Gradient Boosting multiclase con opciones para manejar desbalance de clases.
         
         Args:
             X: Features
             y: Variable objetivo
-            balance_method: None, 'smote', 'undersample', o 'combined'
+
             
         Returns:
             Diccionario con resultados del entrenamiento
@@ -157,37 +131,13 @@ class GradientBoost:
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        # Aplicar técnicas de balanceo si se especifica
-        if balance_method:
-            if balance_method == 'smote':
-                from imblearn.over_sampling import SMOTE
-                print("Aplicando SMOTE para balancear clases...")
-                smote = SMOTE(random_state=42)
-                X_train, y_train = smote.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'undersample':
-                from imblearn.under_sampling import RandomUnderSampler
-                print("Aplicando RandomUnderSampler para balancear clases...")
-                rus = RandomUnderSampler(random_state=42)
-                X_train, y_train = rus.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'combined':
-                from imblearn.combine import SMOTEENN
-                print("Aplicando SMOTEENN (combinación de SMOTE y ENN)...")
-                smoteenn = SMOTEENN(random_state=42)
-                X_train, y_train = smoteenn.fit_resample(X_train, y_train)
-        
-        # Estandarización
-        scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
         
         # Entrenamiento del modelo
-        self.gb_classifier.fit(X_train_scaled, y_train)
+        self.gb_classifier.fit(X_train, y_train)
         
         # Evaluación
-        y_pred = self.gb_classifier.predict(X_test_scaled)
-        y_prob = self.gb_classifier.predict_proba(X_test_scaled)
+        y_pred = self.gb_classifier.predict(X_test)
+        y_prob = self.gb_classifier.predict_proba(X_test)
         
         # Validación cruzada con métrica adecuada para multiclase
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -207,8 +157,7 @@ class GradientBoost:
             'roc_auc': roc_auc,
             'classification_report': classification_report(y_test, y_pred),
             'confusion_matrix': confusion_matrix(y_test, y_pred),
-            'test_data': (X_test_scaled, y_test, y_pred, y_prob),
-            'scaler': scaler,
+            'test_data': (X_test, y_test, y_pred, y_prob),
             'feature_importance': self.gb_classifier.feature_importances_
         }
        
@@ -476,7 +425,7 @@ class GradientBoost:
             plt.close()
         
         # 8. Resumen del clasificador
-        with open(f'visual_model/reporte_{nombre_modelo}.txt', 'w') as f:
+        with open(f'reporte_{nombre_modelo}.txt', 'w') as f:
             f.write(f"===== REPORTE DEL MODELO {nombre_modelo} =====\n\n")
             f.write(f"Accuracy: {resultados['accuracy']:.4f}\n")
             f.write(f"Precision: {resultados['precision']:.4f}\n")

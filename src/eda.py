@@ -7,18 +7,18 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import missingno as msno
 from scipy import stats
-from config import *
+# from config import *
 
-def eda_completo(df, directorio_visualizaciones:str):
+def EDA(df, eda_dir:str):
     """
     Realiza un análisis exploratorio de datos completo para el dataset SHHS.
     """
     print("Iniciando análisis exploratorio de datos completo...")
     
-    # Crear directorio para directorio_visualizaciones
+    # Crear directorio para eda_dir
     import os
-    if not os.path.exists(f'{directorio_visualizaciones}'):
-        os.makedirs(f'{directorio_visualizaciones}')
+    if not os.path.exists(f'{eda_dir}'):
+        os.makedirs(f'{eda_dir}')
     
     # 1. Resumen estadístico básico
     print("\n=== Resumen estadístico básico ===")
@@ -34,14 +34,14 @@ def eda_completo(df, directorio_visualizaciones:str):
     msno.matrix(df)
     plt.title('Patrón de valores faltantes')
     # plt.tight_layout()
-    plt.savefig(f'{directorio_visualizaciones}/valores_faltantes_matriz.png')
+    plt.savefig(f'{eda_dir}/valores_faltantes_matriz.png')
     plt.close()
     
     plt.figure(figsize=(12, 8))
     msno.heatmap(df)
     plt.title('Correlación de valores faltantes')
     # plt.tight_layout()
-    plt.savefig(f'{directorio_visualizaciones}/valores_faltantes_correlacion.png')
+    plt.savefig(f'{eda_dir}/valores_faltantes_correlacion.png')
     plt.close()
     # else:
     #     print("No hay valores faltantes para visualizar")
@@ -61,7 +61,7 @@ def eda_completo(df, directorio_visualizaciones:str):
         sns.histplot(df[var].dropna(), kde=True)
         plt.title(f'Distribución de {var}')
         plt.tight_layout()
-    plt.savefig(f'{directorio_visualizaciones}/distribucion_variables_numericas.png')
+    plt.savefig(f'{eda_dir}/distribucion_variables_numericas.png')
     plt.close()
     
     # 4. Análisis de outliers
@@ -72,7 +72,7 @@ def eda_completo(df, directorio_visualizaciones:str):
         sns.boxplot(y=df[var].dropna())
         plt.title(f'Boxplot de {var}')
         plt.tight_layout()
-    plt.savefig(f'{directorio_visualizaciones}/boxplots_variables_numericas.png')
+    plt.savefig(f'{eda_dir}/boxplots_variables_numericas.png')
     plt.close()
     
     # Detectar y reportar outliers usando el método IQR
@@ -107,7 +107,7 @@ def eda_completo(df, directorio_visualizaciones:str):
     plt.xticks(rotation=90)
     plt.yticks(rotation=0)
     plt.tight_layout()
-    plt.savefig(f'{directorio_visualizaciones}/matriz_correlacion.png')
+    plt.savefig(f'{eda_dir}/matriz_correlacion.png')
     plt.close()
     
     # Identificar las correlaciones más fuertes
@@ -138,7 +138,7 @@ def eda_completo(df, directorio_visualizaciones:str):
     sns.countplot(x='apnea_severity', data=df)
     plt.title('Distribución de severidad de apnea')
     plt.tight_layout()
-    plt.savefig(f'{directorio_visualizaciones}/distribucion_severidad_apnea.png')
+    plt.savefig(f'{eda_dir}/distribucion_severidad_apnea.png')
     plt.close()
     
     # 7. Relación entre variables clínicas y apnea
@@ -153,7 +153,7 @@ def eda_completo(df, directorio_visualizaciones:str):
         axes[i].set_title(f'{var} vs Severidad de Apnea')
         
     plt.tight_layout()
-    plt.savefig(f'{directorio_visualizaciones}/variables_clinicas_vs_apnea.png')
+    plt.savefig(f'{eda_dir}/variables_clinicas_vs_apnea.png')
     plt.close()
     
     # 8. Análisis diferencial entre apnea obstructiva y central
@@ -184,7 +184,7 @@ def eda_completo(df, directorio_visualizaciones:str):
                 axes[i].annotate(f'p-value: {p_val:.4f}', xy=(0.5, 0.9), xycoords='axes fraction')
         
         plt.tight_layout()
-        plt.savefig(f'{directorio_visualizaciones}/comparacion_tipos_apnea_detallada.png')
+        plt.savefig(f'{eda_dir}/comparacion_tipos_apnea_detallada.png')
         plt.close()
         
         # Distribución conjunta de características clave por tipo de apnea
@@ -193,7 +193,7 @@ def eda_completo(df, directorio_visualizaciones:str):
                       hue='tipo_apnea', data=df_apnea)
         plt.title('BMI vs AHI por tipo de apnea')
         plt.tight_layout()
-        plt.savefig(f'{directorio_visualizaciones}/scatter_bmi_ahi_por_tipo.png')
+        plt.savefig(f'{eda_dir}/scatter_bmi_ahi_por_tipo.png')
         plt.close()
         
     # 9. Análisis por género
@@ -213,7 +213,7 @@ def eda_completo(df, directorio_visualizaciones:str):
         sns.histplot(x='nsrr_ahi_hp3r_aasm15', hue='gender_label', data=df, kde=True, common_norm=False)
         plt.title('Distribución de AHI por género')
         plt.tight_layout()
-        plt.savefig(f'{directorio_visualizaciones}/ahi_por_genero.png')
+        plt.savefig(f'{eda_dir}/ahi_por_genero.png')
         plt.close()
         
         plt.figure(figsize=(10, 6))
@@ -223,7 +223,7 @@ def eda_completo(df, directorio_visualizaciones:str):
         plt.title('Distribución porcentual de severidad de apnea por género')
         plt.ylabel('Porcentaje')
         plt.tight_layout()
-        plt.savefig(f'{directorio_visualizaciones}/severidad_apnea_por_genero_percent.png')
+        plt.savefig(f'{eda_dir}/severidad_apnea_por_genero_percent.png')
         plt.close()
     # 10. Análisis multivariado de predictores
     print("\n=== Análisis multivariado de predictores ===")
@@ -234,6 +234,5 @@ def eda_completo(df, directorio_visualizaciones:str):
         plt.figure(figsize=(12, 10))
         sns.pairplot(df[predictores_clave + ['apnea_severity']], hue='apnea_severity')
         plt.tight_layout()
-        plt.savefig(f'{directorio_visualizaciones}/pairplot_predictores.png')
+        plt.savefig(f'{eda_dir}/pairplot_predictores.png')
         plt.close()
-    return df

@@ -2,14 +2,13 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler, RobustScaler, PowerTransformer
 from sklearn.feature_selection import SelectKBest, f_classif, mutual_info_classif
-
-# from sklearn.ensemble import RandomForestClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
-# from imblearn.under_sampling import RandomUnderSampler
 from imblearn.combine import SMOTETomek
 import numpy as np
 
-def prepare_data(df: pd.DataFrame, algoritmo: str, apply_pca=True, n_components=None, modo="binario"):
+from config import TRAIN_TEST_DATA_DIR
+
+def prepare_data(df: pd.DataFrame, apply_pca=False, n_components=None, modo="binario"):
     """
     Prepara los datos para el entrenamiento con mejoras basadas en evidencia científica.
     
@@ -34,7 +33,7 @@ def prepare_data(df: pd.DataFrame, algoritmo: str, apply_pca=True, n_components=
     required_cols = ['apnea', 'apnea_severity_ordinal']
     missing_cols = [col for col in required_cols if col not in df.columns]
     if missing_cols:
-        raise ValueError(f"Variables faltantes: {missing_cols}. Ejecute preprocesar_datos primero")
+        raise ValueError(f"Variables faltantes: {missing_cols}. Ejecute Preprocessing primero")
     
     # 2. Definir variable objetivo según modo
     if modo == 'multiclase':
@@ -51,7 +50,7 @@ def prepare_data(df: pd.DataFrame, algoritmo: str, apply_pca=True, n_components=
     # 3. Preparar variables predictoras con lista ampliada de exclusiones
     variables_a_excluir = [
         'apnea', 'nsrr_ahi_hp4u_aasm15', 'apnea_severity', 'apnea_severity_ordinal',
-        'nsrr_ahi_hp3r_aasm15', 'apnea_significativa', 'apnea_severa'  # Nuevas variables objetivo
+        'nsrr_ahi_hp3r_aasm15' #, 'apnea_significativa', 'apnea_severa'  # Nuevas variables objetivo
     ]
     
     # Variables categóricas expandidas (incluye nuevas características)
@@ -182,16 +181,16 @@ def prepare_data(df: pd.DataFrame, algoritmo: str, apply_pca=True, n_components=
                 print(f"  PC{i+1}: {var_exp*100:.2f}% de varianza")
     
     # Pruebas: Escalado de caracteristicas 
-    # print("Aplicando RobustScaler...")
-    # # Guardar los nombres de las columnas antes de la transformación
-    # original_columns = X.columns
-    # original_index = X.index
+    print("Aplicando RobustScaler...")
+    # Guardar los nombres de las columnas antes de la transformación
+    original_columns = X.columns
+    original_index = X.index
 
-    # scaler = RobustScaler()
-    # X_scaled_array = scaler.fit_transform(X) # Esto devuelve un numpy.ndarray
+    scaler = RobustScaler()
+    X_scaled_array = scaler.fit_transform(X) # Esto devuelve un numpy.ndarray
 
-    # # Convertir el numpy.ndarray de vuelta a un DataFrame, manteniendo columnas e índice
-    # X = pd.DataFrame(X_scaled_array, columns=original_columns, index=original_index)
+    # Convertir el numpy.ndarray de vuelta a un DataFrame, manteniendo columnas e índice
+    X = pd.DataFrame(X_scaled_array, columns=original_columns, index=original_index)
 
     # 8. NUEVA: Balanceo de clases mejorado
     print("Aplicando estrategia de balanceo avanzada...")
@@ -269,115 +268,7 @@ def prepare_data(df: pd.DataFrame, algoritmo: str, apply_pca=True, n_components=
                     X[col] = X[col].replace([np.inf, -np.inf], 0)
     
     # Opcional: Guardar datos preparados para análisis
-    X.to_csv(f"train_test/X_{algoritmo}_{modo}_improved.csv", index=False)
-    y.to_csv(f"train_test/Y_{algoritmo}_{modo}_improved.csv", index=False)
+    X.to_csv(f"{TRAIN_TEST_DATA_DIR}/X_{modo}.csv", index=False)
+    y.to_csv(f"{TRAIN_TEST_DATA_DIR}/Y_{modo}.csv", index=False)
     
     return X, y
-
-# import pandas as pd
-# from sklearn.decomposition import PCA
-# from sklearn.preprocessing import StandardScaler
-
-# def prepare_data(df:pd.DataFrame, algoritmo:str, apply_pca=False, n_components=None, modo="multiclase"):
-        
-#         """n_components=0.95
-#         Prepara los datos para el entrenamiento del modelo SVM con opciones mejoradas.
-        
-#         Args:
-#             df: DataFrame con datos preprocesados
-#             handle_outliers: Si True, maneja valores atípicos usando IQR
-#             apply_pca: Si True, aplica PCA para reducción de dimensionalidad
-#             n_components: Componentes PCA o varianza explicada si es float
-#             modo: 'multiclase' o 'binario'
-#         Returns:
-#             Conjuntos de datos preparados para entrenamiento y evaluación
-#         """
-#         print("Preparando datos para modelado de apnea del sueño...")
-        
-#         # 1. Definir variable objetivo
-#         # if 'apnea' not in df.columns:
-#         if 'apnea' not in df.columns or 'apnea_severity_ordinal' not in df.columns:
-#             raise ValueError("La variable 'apnea' no está en el dataframe, ejecute preprocesar_datos primero")
-        
-        
-        
-#         # 2. Preparar variables predictoras
-#         # Variables a excluir del modelo
-        
-#         """
-#             'nsrr_ahi_hp3r_aasm15': Indice de apnea-hypoapnea con el estandar AASM 2015 
-            
-#             1.- Para la modalidad binaria tenemos que usar 'apnea' como variable objetivo 'y'
-            
-#             2.- Para la modalidad multiclase tenemos que usar 'apnea_severity_ordinal' como variable objetivo 'y'
-#         """
-#         if modo == 'multiclase':
-#             y = df['apnea_severity_ordinal']  # Apnea (cualquier tipo)            
-#         elif modo == 'binario':
-#             y = df['apnea']  # Apnea (cualquier tipo)
-            
-#         variables_a_excluir = [ 'apnea', 'nsrr_ahi_hp4u_aasm15','apnea_severity','apnea_severity_ordinal','nsrr_ahi_hp3r_aasm15']
-#         # Variables categóricas que necesitan convertirse a dummies
-#         variables_categoricas = ['bmi_categoria', 'categoria_pa']
-        
-#         # Buscar otras variables categóricas
-#         for col in df.columns:
-#             if df[col].dtype == 'object' or df[col].dtype == 'category':
-#                 if col not in variables_categoricas and col not in variables_a_excluir:
-#                     variables_categoricas.append(col)
-        
-#         # Crear copia para evitar modificar el dataframe original
-#         X = df.copy()
-        
-#         # Eliminar variables que no deben incluirse
-#         for var in variables_a_excluir:
-#             if var in X.columns:
-#                 X = X.drop(var, axis=1)
-        
-#         # Convertir variables categóricas a dummies
-#         for var in variables_categoricas:
-#             if var in X.columns:
-#                 dummies = pd.get_dummies(X[var], prefix=var, drop_first=True)
-#                 X = pd.concat([X, dummies], axis=1)
-#                 X = X.drop(var, axis=1)
-        
-#         # Verificar que no queden columnas no numéricas
-#         non_numeric_cols = [col for col in X.columns if not pd.api.types.is_numeric_dtype(X[col])]
-#         if non_numeric_cols:
-#             print(f"Advertencia: Eliminando columnas no numéricas restantes: {non_numeric_cols}")
-#             X = X.drop(columns=non_numeric_cols)
-            
-        
-#         # Aplicar PCA si se solicita
-#         if apply_pca:
-            
-    
-#             print(f"Aplicando PCA con componentes={n_components}...")
-#             scaler = StandardScaler()
-#             X_scaled = scaler.fit_transform(X)
-            
-#             pca = PCA(n_components=n_components, random_state=42)
-#             X_pca = pca.fit_transform(X_scaled)
-            
-#             # Convertir resultado PCA de vuelta a DataFrame
-#             if isinstance(n_components, float):
-#                 n_cols = pca.n_components_
-#             else:
-#                 n_cols = n_components
-                
-#             X = pd.DataFrame(
-#                 X_pca, 
-#                 columns=[f'PC{i+1}' for i in range(n_cols)],
-#                 index=X.index
-#             )
-            
-#             print(f"Varianza explicada: {sum(pca.explained_variance_ratio_)*100:.2f}%")
-#         # print("\nX: ")
-#         # print(X.head(5))
-#         # print("\nY: ")
-#         # print(y.head(5))
-        
-#         # X.to_csv(f"train_test/X_{algoritmo}_{modo}.csv")
-#         # y.to_csv(f"train_test/Y_{algoritmo}_{modo}.csv")
-        
-#         return X, y

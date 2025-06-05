@@ -194,10 +194,7 @@ class PSOFeatureSelection:
         return self.fit(X, y, classifier).transform(X)
 
 
-def prepare_data_with_pso_smotetomek(df: pd.DataFrame, algoritmo: str, 
-                                   apply_pca=False, n_components=None, 
-                                   modo="multiclase", use_pso=True, 
-                                   pso_params=None):
+def prepare_data_with_pso_smotetomek(df: pd.DataFrame,apply_pca=False, n_components=None, modo="multiclase", use_pso=True, pso_params=None):
     """
     Prepara los datos para el entrenamiento implementando PSO + SMOTETomek
     según la metodología del paper de reconocimiento de personalidad.

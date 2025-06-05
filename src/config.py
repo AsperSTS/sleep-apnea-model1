@@ -1,18 +1,40 @@
 """
 Archivo de configuración con constantes y parámetros del modelo
 """
+import os
 
-# Rutas de archivos globales
-DATA_PATH = "shhs-harmonized-filtered.csv"
-MODELS_DIR = "modelos"
-MODEL_FILENAME = "modelo_apnea_obstructiva.joblib"
+# Informacion de los datasets
+DATA_PATH = "shhs_hchs_33_25_21_21.csv" # "shhs_hchs.csv"
+VARIABLES_TO_EXCLUDE = ['nsrr_ethnicity', 'nsrr_race']
+
+# Modelos a entrenar
+MODELS_TO_TRAIN = ["SVM", "RandomForest","GradientBoost"]
+
+# Carpetas de resultados
 VISUAL_EDA_DIR = "visual_eda"
-VISUAL_PREPROCESSED_DIR = "visual_preprocesado"
+VISUAL_PREPROCESSED_DIR = "visual_pre"
 VISUAL_MODEL_DIR = "visual_model"
 TRAIN_TEST_DATA_DIR = "train_test"
 
-# Rutas de archivos de modelos
-SVM_RESULTS_PATH = "visual_model/svm"
+# Rutas de reportes
+REPORTS_BASE_DIR = "reports"
+SVM_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "svm")
+GB_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "gradient_boosting")
+RF_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "random_forest")
+EDA_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "eda")
+PREPROCESSING_REPORTS_PATH = os.path.join(REPORTS_BASE_DIR, "preprocessing")
+
+# Carpetas de modelos
+MODELS_DIR = "models"
+SVM_MODELS_DIR = os.path.join(MODELS_DIR, "svm")
+RF_MODELS_DIR = os.path.join(MODELS_DIR, "random_forest")
+GB_MODELS_DIR = os.path.join(MODELS_DIR, "gradient_boosting")
+
+
+# Nombres de modelos a almacenar
+SVM_MODEL_FILENAME = "svm_model.joblib"
+GB_MODEL_FILENAME = "rf_model.joblib"
+RF_MODEL_FILENAME = "gb_model.joblib"
 
 # Parámetros para preprocesamiento
 EDAD_MIN = 28
@@ -29,19 +51,7 @@ CARACTERISTICAS_CATEGORICAS = [
     'nsrr_current_smoker', 'nsrr_ever_smoker'
 ]
 
+
+
+
 # Parámetros para los modelos
-RANDOM_STATE = 42
-TEST_SIZE = 0.2
-
-# Parámetros para GridSearchCV
-PARAMS_RANDOM_FOREST = {
-    'classifier__n_estimators': [100, 200],
-    'classifier__max_depth': [None, 10, 20],
-    'classifier__min_samples_split': [2, 5]
-}
-
-PARAMS_GRADIENT_BOOSTING = {
-    'classifier__n_estimators': [100, 200],
-    'classifier__learning_rate': [0.1, 0.05],
-    'classifier__max_depth': [3, 5]
-}

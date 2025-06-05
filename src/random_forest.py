@@ -4,10 +4,10 @@ Módulo para la construcción y entrenamiento de modelos Random Forest
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split, RandomizedSearchCV, cross_val_score, StratifiedKFold
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc, roc_auc_score, precision_recall_curve, average_precision_score
 
-from scipy.stats import uniform, randint
+from scipy.stats import randint
 from sklearn.decomposition import PCA
 import pandas as pd
 from config import *
@@ -59,14 +59,13 @@ class RandomForest:
             'class_weight': ['balanced', 'balanced_subsample', None]
         }
                   
-    def train_rf_binary(self, X, y, balance_method='combined'):  
+    def train_rf_binary(self, X, y):  
         """
         Entrena el modelo de clasificación Random Forest con opciones para manejar desbalance de clases.
         
         Args:
             X: Features
             y: Variable objetivo
-            balance_method: None, 'smote', 'undersample', o 'combined'
             
         Returns:
             Diccionario con resultados del entrenamiento
@@ -78,37 +77,13 @@ class RandomForest:
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        # Aplicar técnicas de balanceo si se especifica
-        if balance_method:
-            if balance_method == 'smote':
-                from imblearn.over_sampling import SMOTE
-                print("Aplicando SMOTE para balancear clases...")
-                smote = SMOTE(random_state=42)
-                X_train, y_train = smote.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'undersample':
-                from imblearn.under_sampling import RandomUnderSampler
-                print("Aplicando RandomUnderSampler para balancear clases...")
-                rus = RandomUnderSampler(random_state=42)
-                X_train, y_train = rus.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'combined':
-                from imblearn.combine import SMOTEENN
-                print("Aplicando SMOTEENN (combinación de SMOTE y ENN)...")
-                smoteenn = SMOTEENN(random_state=42)
-                X_train, y_train = smoteenn.fit_resample(X_train, y_train)
-        
-        # Random Forest no requiere estandarización, pero la incluimos para consistencia
-        scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
         
         # Entrenamiento del modelo
-        self.rf_classifier.fit(X_train_scaled, y_train)
+        self.rf_classifier.fit(X_train, y_train)
         
         # Evaluación
-        y_pred = self.rf_classifier.predict(X_test_scaled)
-        y_prob = self.rf_classifier.predict_proba(X_test_scaled)[:, 1]
+        y_pred = self.rf_classifier.predict(X_test)
+        y_prob = self.rf_classifier.predict_proba(X_test)[:, 1]
         
         # Validación cruzada
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -134,21 +109,20 @@ class RandomForest:
             'pr_auc': pr_auc,
             'classification_report': classification_report(y_test, y_pred),
             'confusion_matrix': confusion_matrix(y_test, y_pred),
-            'test_data': (X_test_scaled, y_test, y_pred, y_prob),
-            'scaler': scaler,
+            'test_data': (X_test, y_test, y_pred, y_prob),
+            # 'scaler': scaler,
             'roc_curve': (fpr, tpr),
             'pr_curve': (precision, recall),
             'feature_importance': self.rf_classifier.feature_importances_
         }
     
-    def train_rf_multiclase(self, X, y, balance_method='combined'):  
+    def train_rf_multiclase(self, X, y):  
         """
         Entrena el modelo de clasificación Random Forest multiclase con opciones para manejar desbalance de clases.
         
         Args:
             X: Features
             y: Variable objetivo
-            balance_method: None, 'smote', 'undersample', o 'combined'
             
         Returns:
             Diccionario con resultados del entrenamiento
@@ -160,37 +134,12 @@ class RandomForest:
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        # Aplicar técnicas de balanceo si se especifica
-        if balance_method:
-            if balance_method == 'smote':
-                from imblearn.over_sampling import SMOTE
-                print("Aplicando SMOTE para balancear clases...")
-                smote = SMOTE(random_state=42)
-                X_train, y_train = smote.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'undersample':
-                from imblearn.under_sampling import RandomUnderSampler
-                print("Aplicando RandomUnderSampler para balancear clases...")
-                rus = RandomUnderSampler(random_state=42)
-                X_train, y_train = rus.fit_resample(X_train, y_train)
-                
-            elif balance_method == 'combined':
-                from imblearn.combine import SMOTEENN
-                print("Aplicando SMOTEENN (combinación de SMOTE y ENN)...")
-                smoteenn = SMOTEENN(random_state=42)
-                X_train, y_train = smoteenn.fit_resample(X_train, y_train)
-        
-        # Estandarización para consistencia
-        scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
-        
         # Entrenamiento del modelo
-        self.rf_classifier.fit(X_train_scaled, y_train)
+        self.rf_classifier.fit(X_train, y_train)
         
         # Evaluación
-        y_pred = self.rf_classifier.predict(X_test_scaled)
-        y_prob = self.rf_classifier.predict_proba(X_test_scaled)
+        y_pred = self.rf_classifier.predict(X_test)
+        y_prob = self.rf_classifier.predict_proba(X_test)
         
         # Validación cruzada con métrica adecuada para multiclase
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -210,8 +159,7 @@ class RandomForest:
             'roc_auc': roc_auc,
             'classification_report': classification_report(y_test, y_pred),
             'confusion_matrix': confusion_matrix(y_test, y_pred),
-            'test_data': (X_test_scaled, y_test, y_pred, y_prob),
-            'scaler': scaler,
+            'test_data': (X_test, y_test, y_pred, y_prob),
             'feature_importance': self.rf_classifier.feature_importances_
         }
        

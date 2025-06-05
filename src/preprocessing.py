@@ -4,17 +4,11 @@ Basado en evidencia científica y mejores prácticas de machine learning
 """
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import RobustScaler
 from sklearn.impute import KNNImputer, SimpleImputer
-from sklearn.feature_selection import SelectKBest, f_classif, RFE
-from sklearn.ensemble import RandomForestClassifier
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
 from config import *
 
 
-def preprocesar_datos(df, estrategia_imputation='knn'):
+def Preprocessing(df, estrategia_imputation='knn'):
     """
     Realiza el preprocesamiento de datos para predicción de apnea del sueño.
     Mejoras basadas en evidencia científica reciente.
@@ -98,7 +92,7 @@ def preprocesar_datos(df, estrategia_imputation='knn'):
         if var in variables_criticas:
             continue  # No eliminar outliers de variables críticas
             
-        # Calcular límites para outliers usando método más conservador (4 IQR en lugar de 3)
+        # Calcular límites para outliers usando método más conservador 3 IQR
         q1 = df_procesado[var].quantile(0.25)
         q3 = df_procesado[var].quantile(0.75)
         iqr = q3 - q1
@@ -196,7 +190,8 @@ def preprocesar_datos(df, estrategia_imputation='knn'):
     if risk_factors:
         df_procesado['clinical_risk_score'] = df_procesado[risk_factors].sum(axis=1)
     
-    # 7. Creación de variable objetivo para apnea MEJORADA
+    
+    # 7. Creación de variable objetivo para apnea
     print("Creando variable objetivo para apnea del sueño con umbrales optimizados...")
     
     if 'nsrr_ahi_hp3r_aasm15' in df_procesado.columns:
@@ -210,15 +205,10 @@ def preprocesar_datos(df, estrategia_imputation='knn'):
         # Variable binaria de apnea (AHI ≥ 5)
         df_procesado['apnea'] = (df_procesado['nsrr_ahi_hp3r_aasm15'] >= 5).astype(int)
         
-        # Variable ordinal de severidad (útil para algunos modelos)
+        # Variable ordinal de severidad (Para prediccion multiclase)
         severity_map = {'Normal': 0, 'Leve': 1, 'Moderada': 2, 'Severa': 3}
         df_procesado['apnea_severity_ordinal'] = df_procesado['apnea_severity'].map(severity_map)
-        
-        # NUEVA: Variable binaria para apnea clínicamente significativa (AHI ≥ 15)
-        df_procesado['apnea_significativa'] = (df_procesado['nsrr_ahi_hp3r_aasm15'] >= 15).astype(int)
-        
-        # NUEVA: Variable binaria para apnea severa (AHI ≥ 30)
-        df_procesado['apnea_severa'] = (df_procesado['nsrr_ahi_hp3r_aasm15'] >= 30).astype(int)
+
 
     print(f"Preprocesamiento completado. Registros resultantes: {len(df_procesado)}")
     
@@ -248,7 +238,7 @@ def preprocesar_datos(df, estrategia_imputation='knn'):
 # from config import *
 
 
-# def preprocesar_datos(df, estrategia_imputation='knn'):
+# def Preprocessing(df, estrategia_imputation='knn'):
 #     """
 #     Realiza el preprocesamiento de datos para predicción de apnea del sueño.
     

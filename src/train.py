@@ -1,51 +1,56 @@
 """
-Script simplificado para entrenar modelos de diagnóstico de apnea del sueño
+Script simplificado para entrenar models de diagnóstico de apnea del sueño
 """
+import time
 import argparse
-from utils import cargar_datos
-from preprocessing import preprocesar_datos
-from eda import eda_completo
-from svm import SVM
+
 from random_forest import RandomForest
 from gradient_boost import GradientBoost
+from svm import SVM
+from utils import load_data, create_folders, generate_unique_timestamp
+from preprocessing import Preprocessing
+from eda import EDA
 from prepare_data import prepare_data
-from pso import prepare_data_with_pso_smotetomek
-from config import *
+from config import MODELS_TO_TRAIN, VISUAL_EDA_DIR, VISUAL_PREPROCESSED_DIR 
+#from pso import prepare_data_with_pso_smotetomek
 
-def entrenar_modelo(datos_procesados, modelos, modo):
+TIMESTAMP = generate_unique_timestamp()
+
+def train_model(processed_data, models: list, modo: str) -> None:
     """Entrena un modelo específico en el modo especificado"""
+    X, y = prepare_data(processed_data, modo=modo)
+    # Reemplaza tu función prepare_data() original con:
+    # pso_params = {
+    #     'n_particles': 20,      # Número de partículas del enjambre
+    #     'max_iterations': 30,   # Iteraciones máximas
+    #     'w': 0.5,              # Peso de inercia
+    #     'c1': 2.0,             # Constante de aceleración personal
+    #     'c2': 2.0,             # Constante de aceleración social
+    #     'min_features': 14     # Mínimo de características a mantener
+    # }
+    # X, y = prepare_data_with_pso_smotetomek(
+    #     processed_data,  
+    #     modo=modo,
+    #     use_pso=True,
+    #     pso_params=pso_params
+    # )
     
-    if "SVM" in modelos:
+    if "SVM" in models:
         model = SVM()
-        # X, y = prepare_data(datos_procesados, "SVM", modo=modo)
-        # Reemplaza tu función prepare_data() original con:
-        pso_params = {
-            'n_particles': 20,      # Número de partículas del enjambre
-            'max_iterations': 30,   # Iteraciones máximas
-            'w': 0.5,              # Peso de inercia
-            'c1': 2.0,             # Constante de aceleración personal
-            'c2': 2.0,             # Constante de aceleración social
-            'min_features': 14     # Mínimo de características a mantener
-        }
-        X, y = prepare_data_with_pso_smotetomek(
-            datos_procesados, 
-            algoritmo="SVM", 
-            modo=modo,
-            use_pso=True,
-            pso_params=pso_params
-        )
         
         if modo == "binario":
+            # results = model.find_best_parameters_binary(X,y)
+            # model.mostrar_resultados_randomized_search_binary(results)
+            
             results = model.train_svm_binary(X, y)
             model.visualizar_resultados_binario(results, nombre_modelo="SVM_binario")
+            
         else:  # multiclase
             results = model.train_svm_multiclase(X, y)
             model.visualizar_resultados_multiclase(results, nombre_modelo='SVM_multiclase')
             
-    if "RandomForest" in modelos:
+    if "RandomForest" in models:
         model = RandomForest()
-        X, y = prepare_data(datos_procesados, "Random Forest", modo=modo)
-        
         if modo == "binario":
             results = model.train_rf_binary(X, y)
             model.visualizar_resultados_rf(resultados=results, tipo_clasificacion='binaria')
@@ -53,10 +58,8 @@ def entrenar_modelo(datos_procesados, modelos, modo):
             results = model.train_rf_multiclase(X, y)
             model.visualizar_resultados_rf(resultados=results, tipo_clasificacion='multiclase')
             
-    if "GradientBoost" in modelos:
+    if "GradientBoost" in models:
         model = GradientBoost()
-        X, y = prepare_data(datos_procesados, "Gradient Boost", modo="binaria" if modo == "binario" else modo)
-        
         if modo == "binario":
             results = model.train_gb_binary(X, y)
             model.visualizar_resultados_gb_binario(results, nombre_modelo="GB Binario")
@@ -64,50 +67,45 @@ def entrenar_modelo(datos_procesados, modelos, modo):
             results = model.train_gb_multiclase(X, y)
             model.visualizar_resultados_gb_multiclase(results, nombre_modelo="GB Multiclase")
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description='Entrenamiento de modelo para apnea del sueño')
-    parser.add_argument('--data', type=str, default=DATA_PATH, help=f'Ruta al archivo de datos (default: {DATA_PATH})')
     parser.add_argument('--eda', action='store_true', help='Realizar análisis exploratorio')
-    parser.add_argument('--modelo-salida', type=str, default=MODEL_FILENAME, help=f'Nombre del archivo de salida del modelo (default: {MODEL_FILENAME})')
-    parser.add_argument('--pre', action='store_true', help="Hacer preprocesamiento")
     parser.add_argument('--train', action='store_true', help="Hacer entrenamiento")
-    # parser.add_argument('--modelo', type=str, default="SVM", choices=["SVM", "RandomForest", "GradientBoost"], help="Tipo de modelo a entrenar")
     parser.add_argument('--modo', type=str, default="multiclase", choices=["binario", "multiclase"], help="Modo de clasificación")
     
     """
         Ejemplo: python main.py --pre --train --modelo SVM --modo multiclase
     """
-    
+    start_time = time.time()
     args = parser.parse_args()
     
-    # Cargar datos
-    # datos = cargar_datos("shhs_hchs_40_20_20_20.csv")
-    datos = cargar_datos("shhs_hchs.csv")
-    datos = datos.drop(['nsrr_ethnicity', 'nsrr_race'], axis=1)
-    print(f"Datos cargados: {len(datos)} pacientes")
+    # Cargar data
+    data = load_data()
+    print(f"Datos cargados: {len(data)} pacientes")
+    
+    # Se crean todas las carpetas necesarias para el proyecto
+    create_folders()
     
     # EDA opcional
     if args.eda:
-        datos_procesados = eda_completo(datos, "visual_eda")
+        EDA(data, VISUAL_EDA_DIR)
     
     # Preprocesamiento
-    if args.pre:
-        datos_procesados = preprocesar_datos(datos)
-        if args.eda:
-            datos_procesados = eda_completo(datos_procesados, "visual_preprocesado")
-        print("Preprocesamiento completado")
-    else:
-        print("Preprocesamiento omitido")
-        return
+    processed_data = Preprocessing(data)
+    if args.eda:
+        processed_data = EDA(processed_data, VISUAL_PREPROCESSED_DIR)
+    print("Preprocesamiento completado")
     
     # Entrenamiento
     if args.train:
-        # entrenar_modelo(datos_procesados, args.modelo, args.modo)
         """
-            Optiones de modelos a entrenar"SVM", "RandomForest", "GradientBoost"
+            Optiones de models a entrenar"SVM", "RandomForest", "GradientBoost"
         """
-        modelos_entrenar = ["SVM", "RandomForest"]
-        entrenar_modelo(datos_procesados, modelos_entrenar, args.modo)
+        train_model(processed_data, MODELS_TO_TRAIN, args.modo)
+        
+        end_time = time.time()
+        total_time = end_time-start_time
+        print(f"Tiempo de entrenamiento: {total_time if total_time<60 else total_time/60}{'s' if total_time<60 else 'm'}")
     else:
         print("Para entrenar el modelo utiliza la opcion --train")
 
