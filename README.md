@@ -1,223 +1,235 @@
-# Sleep Apnea Diagnosis ML Project 🫁
+# Sleep Apnea Diagnosis
 
-*A machine learning approach to diagnose obstructive and central sleep apnea using harmonized SHHS and HCHS datasets*
+Machine learning models for diagnosing obstructive and central sleep apnea using SHHS and HCHS datasets.
 
 ## English Version
 
-### 📋 Overview
+### Overview
 
-This project implements machine learning models to diagnose sleep apnea in patients using clinical and demographic data from the harmonized Sleep Heart Health Study (SHHS) and Hispanic Community Health Study (HCHS) datasets available at SleepData.org. The system can predict both binary (presence/absence) and multiclass (severity levels) classifications of sleep apnea.
+This project builds ML models to diagnose sleep apnea using clinical data from the Sleep Heart Health Study (SHHS) and Hispanic Community Health Study (HCHS), both available at SleepData.org. The models predict binary classification (apnea vs. normal) and multi-class severity levels.
 
-### 🎯 Objectives
+### Goals
 
-- **Primary Goal**: Develop accurate ML models for sleep apnea diagnosis using non-invasive clinical parameters
-- **Secondary Goals**: 
-  - Compare performance between different ML algorithms (SVM, Random Forest, Gradient Boosting)
-  - Provide interpretable results for clinical decision support
-  - Handle class imbalance typical in medical datasets
+- Build accurate ML models for sleep apnea diagnosis using non-invasive clinical data
+- Compare SVM, Random Forest, and Gradient Boosting performance
+- Handle class imbalance in medical datasets
+- Generate interpretable results for clinical use
 
-### 🔬 Scientific Approach
+### Methods
 
-The project follows evidence-based preprocessing and feature engineering techniques:
+**Data Processing:**
+- KNN imputation for missing values
+- 3-IQR outlier detection (conservative approach for medical data)
+- SMOTE/ADASYN for class balancing
+- Feature selection using mutual information and F-scores
 
-- **Advanced Imputation**: KNN-based imputation for missing values
-- **Clinical Feature Engineering**: BMI categorization, blood pressure classification, risk factor combinations
-- **Robust Outlier Detection**: Conservative 3-IQR method to preserve medical data integrity
-- **Class Balancing**: SMOTE/ADASYN techniques for handling imbalanced datasets
-- **Feature Selection**: Hybrid approach using mutual information and F-score methods
+**Feature Engineering:**
+- BMI categories (WHO standards)
+- Blood pressure levels (AHA guidelines)
+- Obesity indicators (BMI ≥30, ≥35)
+- Hypertension severity
+- Combined risk scores
 
-### 🏗️ Project Structure
+### Project Structure
 
 ```
 sleep-apnea-diagnosis/
-├──test
-├──src
-│   ├── train.py             # Main training script
-│   ├── preprocessing.py     # Data preprocessing and feature engineering
-│   ├── eda.py               # Exploratory Data Analysis
-│   ├── prepare_data.py      # Data preparation for ML models
-│   ├── predict.py           # Prediction script for new patients
-│   ├── config.py            # Configuration parameters
-│   ├── utils.py             # Useful functions
-│   ├── svm.py               # Svm implementation               
-│   ├── random_forest.py     # Random Forest implementation
-│   ├── gradient_boost.py    # Gradient Boost implementation
-│   ├── models/              # Store the models
-│   ├── reports/             # Store the reports and the graphics
-│   ├── train_test/          # Store the Test and Train datasets
-│   ├── visual_eda/          # Store the Exploratory Data Analysis graphics
-│   ├── visual_pre/          # Store the Preprocessing graphics and analytics  
-│   └── visual_model/        
-
+├── test/
+├── src/
+│   ├── train.py             # Training script
+│   ├── preprocessing.py     # Data preprocessing
+│   ├── eda.py               # Exploratory analysis
+│   ├── prepare_data.py      # Data preparation
+│   ├── predict.py           # Prediction script
+│   ├── config.py            # Configuration
+│   ├── utils.py             # Utilities
+│   ├── svm.py               # SVM model
+│   ├── random_forest.py     # Random Forest model
+│   ├── gradient_boost.py    # Gradient Boosting model
+│   ├── models/              # Saved models
+│   ├── reports/             # Reports and plots
+│   ├── train_test/          # Train/test splits
+│   ├── visual_eda/          # EDA plots
+│   ├── visual_pre/          # Preprocessing plots
+│   └── visual_model/        # Model visualizations
 ```
 
-### 🚀 Quick Start
-
-#### Prerequisites
+### Installation
 
 ```bash
 pip install pandas numpy scikit-learn matplotlib seaborn imbalanced-learn missingno
 ```
 
-#### Basic Usage
+### Usage
 
-1. **Complete Analysis with Visualizations (no training)**:
-   ```bash
-   python train.py --eda
-   ```
+**Run EDA only (no training):**
+```bash
+python train.py --eda
+```
 
-2. **Training with Binary Classification**:
-   ```bash
-   python train.py --train --modo binario
-   ```
+**Train binary classifier:**
+```bash
+python train.py --train --modo binario
+```
 
-3. **Training with Multiclass Severity Classification**:
-   ```bash
-   python train.py --train --modo multiclase
-   ```
+**Train multi-class classifier:**
+```bash
+python train.py --train --modo multiclase
+```
 
+### Features
 
-### 📊 Features
+**Clinical inputs:**
+- Age, BMI, blood pressure (systolic/diastolic)
+- Smoking status (current/former)
+- Gender, race/ethnicity
+- Arousal index and polysomnographic measures
 
-**Clinical Parameters Used:**
-- Age, BMI, Blood Pressure (systolic/diastolic)
-- Smoking history (current/ever smoker)
-- Gender, Race/Ethnicity
-- Arousal index and other polysomnographic measures
+**Engineered features:**
+- BMI categories
+- Blood pressure classification
+- Obesity flags
+- Hypertension levels
+- Clinical risk combinations
 
-**Engineered Features:**
-- BMI categories (WHO classification)
-- Blood pressure classification (AHA guidelines)
-- Obesity indicators (BMI ≥30, ≥35)
-- Hypertension severity levels
-- Combined clinical risk scores
+### Models
 
-### 🎯 Model Performance
-
-The system supports three main algorithms:
-- **Support Vector Machine (SVM)**: High accuracy with proper hyperparameter tuning
-- **Random Forest**: Excellent feature importance interpretation
-- **Gradient Boosting**: Strong performance on imbalanced datasets
+Three algorithms available:
+- **SVM**: Good accuracy with tuned hyperparameters
+- **Random Forest**: Best for feature importance analysis
+- **Gradient Boosting**: Handles imbalanced data well
 
 Classification modes:
 - **Binary**: Normal vs. Sleep Apnea (AHI ≥ 5)
-- **Multiclass**: Normal, Mild, Moderate, Severe (based on AHI thresholds: 5, 15, 30)
+- **Multi-class**: Normal, Mild, Moderate, Severe (AHI thresholds: 5, 15, 30)
 
-### 📈 Results and Visualization
+### Output
 
-The system automatically generates:
-- Confusion matrices and classification reports
+The pipeline generates:
+- Confusion matrices
+- Classification reports
 - Feature importance plots
-- ROC curves and precision-recall curves
-- Distribution analysis of clinical variables
+- ROC and precision-recall curves
+- Distribution plots
 - Correlation heatmaps
 
-### 🔍 Data Sources
+### Data Sources
 
-This project uses harmonized datasets from:
-- **SHHS (Sleep Heart Health Study)**: Multi-site cohort study of sleep disorders
-- **HCHS (Hispanic Community Health Study)**: Focus on Hispanic/Latino populations
-- **Source**: SleepData.org - National Sleep Research Resource
+- **SHHS**: Multi-site cohort study on sleep disorders
+- **HCHS**: Hispanic/Latino population focus
+- **Source**: SleepData.org (National Sleep Research Resource)
 
-### ⚠️ Important Notes
+### Disclaimer
 
-- This is a research/educational tool and should not replace professional medical diagnosis
-- Results should be validated with clinical expertise
-- The model is trained on specific populations and may not generalize to all demographics
+This is a research tool. Do not use for medical diagnosis without clinical validation. Models trained on specific populations may not generalize to all demographics.
 
 ---
 
 ## Versión en Español
 
-### 📋 Descripción General
+### Descripción
 
-Este proyecto implementa modelos de aprendizaje automático para diagnosticar apnea del sueño en pacientes utilizando datos clínicos y demográficos de las bases de datos armonizadas SHHS y HCHS disponibles en SleepData.org. El sistema puede predecir tanto clasificaciones binarias (presencia/ausencia) como multiclase (niveles de severidad) de apnea del sueño.
+Este proyecto construye modelos de ML para diagnosticar apnea del sueño usando datos clínicos de SHHS y HCHS (disponibles en SleepData.org). Los modelos predicen clasificación binaria (apnea vs. normal) y niveles de severidad multi-clase.
 
-### 🎯 Objetivos
+### Objetivos
 
-- **Objetivo Principal**: Desarrollar modelos de ML precisos para el diagnóstico de apnea del sueño usando parámetros clínicos no invasivos
-- **Objetivos Secundarios**:
-  - Comparar el rendimiento entre diferentes algoritmos de ML (SVM, Random Forest, Gradient Boosting)
-  - Proporcionar resultados interpretables para apoyo en decisiones clínicas
-  - Manejar el desbalance de clases típico en conjuntos de datos médicos
+- Construir modelos ML precisos para diagnóstico de apnea del sueño con datos clínicos no invasivos
+- Comparar rendimiento de SVM, Random Forest y Gradient Boosting
+- Manejar desbalance de clases en datasets médicos
+- Generar resultados interpretables para uso clínico
 
-### 🔬 Enfoque Científico
+### Métodos
 
-El proyecto sigue técnicas de preprocesamiento e ingeniería de características basadas en evidencia:
+**Procesamiento de datos:**
+- Imputación KNN para valores faltantes
+- Detección de outliers con 3-IQR (conservador para datos médicos)
+- SMOTE/ADASYN para balanceo de clases
+- Selección de features con información mutua y F-scores
 
-- **Imputación Avanzada**: Imputación basada en KNN para valores faltantes
-- **Ingeniería de Características Clínicas**: Categorización de IMC, clasificación de presión arterial, combinaciones de factores de riesgo
-- **Detección Robusta de Valores Atípicos**: Método conservador 3-IQR para preservar la integridad de los datos médicos
-- **Balanceo de Clases**: Técnicas SMOTE/ADASYN para manejar conjuntos de datos desbalanceados
-- **Selección de Características**: Enfoque híbrido usando información mutua y métodos F-score
-
-### 🚀 Inicio Rápido
-
-#### Uso Básico
-
-1. **Análisis Completo con Visualizaciones (sin entrenamiento)**:
-   ```bash
-   python train.py --eda
-   ```
-
-2. **Entrenamiento con Clasificación Binaria**:
-   ```bash
-   python train.py --train --modo binario
-   ```
-
-3. **Entrenamiento con Clasificación Multiclase de Severidad**:
-   ```bash
-   python train.py --train --modo multiclase
-   ```
-
-
-### 📊 Características
-
-**Parámetros Clínicos Utilizados:**
-- Edad, IMC, Presión Arterial (sistólica/diastólica)
-- Historial de tabaquismo (fumador actual/alguna vez)
-- Género, Raza/Etnia
-- Índice de despertar y otras medidas polisomnográficas
-
-**Características Diseñadas:**
-- Categorías de IMC (clasificación OMS)
-- Clasificación de presión arterial (guías AHA)
+**Ingeniería de features:**
+- Categorías de IMC (estándares OMS)
+- Niveles de presión arterial (guías AHA)
 - Indicadores de obesidad (IMC ≥30, ≥35)
-- Niveles de severidad de hipertensión
-- Puntuaciones combinadas de riesgo clínico
+- Severidad de hipertensión
+- Puntajes de riesgo combinados
 
-### 🎯 Rendimiento del Modelo
+### Instalación
 
-El sistema soporta tres algoritmos principales:
-- **Support Vector Machine (SVM)**: Alta precisión con ajuste adecuado de hiperparámetros
-- **Random Forest**: Excelente interpretación de importancia de características
-- **Gradient Boosting**: Fuerte rendimiento en conjuntos de datos desbalanceados
+```bash
+pip install pandas numpy scikit-learn matplotlib seaborn imbalanced-learn missingno
+```
+
+### Uso
+
+**Solo análisis exploratorio (sin entrenamiento):**
+```bash
+python train.py --eda
+```
+
+**Entrenar clasificador binario:**
+```bash
+python train.py --train --modo binario
+```
+
+**Entrenar clasificador multi-clase:**
+```bash
+python train.py --train --modo multiclase
+```
+
+### Features
+
+**Inputs clínicos:**
+- Edad, IMC, presión arterial (sistólica/diastólica)
+- Estado de fumador (actual/anterior)
+- Género, raza/etnia
+- Índice de arousal y medidas polisomnográficas
+
+**Features diseñados:**
+- Categorías de IMC
+- Clasificación de presión arterial
+- Flags de obesidad
+- Niveles de hipertensión
+- Combinaciones de riesgo clínico
+
+### Modelos
+
+Tres algoritmos disponibles:
+- **SVM**: Buena precisión con hiperparámetros ajustados
+- **Random Forest**: Mejor para análisis de importancia de features
+- **Gradient Boosting**: Maneja bien datos desbalanceados
 
 Modos de clasificación:
 - **Binario**: Normal vs. Apnea del Sueño (AHI ≥ 5)
-- **Multiclase**: Normal, Leve, Moderada, Severa (basado en umbrales AHI: 5, 15, 30)
+- **Multi-clase**: Normal, Leve, Moderada, Severa (umbrales AHI: 5, 15, 30)
 
-### ⚠️ Notas Importantes
+### Resultados
 
-- Esta es una herramienta de investigación/educación y no debe reemplazar el diagnóstico médico profesional
-- Los resultados deben ser validados con experiencia clínica
-- El modelo está entrenado en poblaciones específicas y puede no generalizarse a todas las demografías
+El pipeline genera:
+- Matrices de confusión
+- Reportes de clasificación
+- Gráficos de importancia de features
+- Curvas ROC y precision-recall
+- Gráficos de distribución
+- Mapas de calor de correlación
 
-### 🔍 Fuentes de Datos
+### Fuentes de Datos
 
-Este proyecto utiliza conjuntos de datos armonizados de:
-- **SHHS (Sleep Heart Health Study)**: Estudio de cohorte multi-sitio de trastornos del sueño
-- **HCHS (Hispanic Community Health Study)**: Enfoque en poblaciones hispanas/latinas
-- **Fuente**: SleepData.org - Recurso Nacional de Investigación del Sueño
+- **SHHS**: Estudio de cohorte multi-sitio sobre trastornos del sueño
+- **HCHS**: Enfoque en población hispana/latina
+- **Fuente**: SleepData.org (National Sleep Research Resource)
 
-### 📝 Licencia
+### Aviso
 
-Este proyecto está disponible para uso académico y de investigación. Por favor, cite apropiadamente si utiliza este código en publicaciones científicas.
+Esta es una herramienta de investigación. No usar para diagnóstico médico sin validación clínica. Los modelos entrenados en poblaciones específicas pueden no generalizarse a todas las demografías.
 
-### 🤝 Contribuciones
+### License
 
-Las contribuciones son bienvenidas. Por favor, abra un issue para discutir cambios mayores antes de enviar un pull request.
+Available for academic and research use. Please cite appropriately in scientific publications.
 
-### 📞 Contacto
+### Contributing
 
-Para preguntas sobre el proyecto o colaboraciones, por favor abra un issue en este repositorio.
+Open an issue to discuss major changes before submitting a pull request.
+
+### Contact
+
+For questions or collaborations, open an issue in this repository.
