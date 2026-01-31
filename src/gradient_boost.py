@@ -1,6 +1,3 @@
-"""
-Módulo para la construcción y entrenamiento de modelos Gradient Boosting
-"""
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, cross_val_score, StratifiedKFold
@@ -10,12 +7,13 @@ from config import GB_MODEL_FILENAME, GB_MODELS_DIR
 from utils import save_model
 
 class GradientBoosting:
+    """
+    Manages GradientBoostingClassifier configuration, training, and optimization.
+    
+    Handles default hyperparameter setup and cross-validation strategies.
+    """
     def __init__(self):
-        # Parámetros optimizados para Gradient Boosting
-        """
-        Configuración optimizada para Gradient Boosting basada en mejores prácticas
-        """
-        
+        # Set default hyperparameters
         self.gb_n_estimators = 100
         self.gb_learning_rate = 0.1
         self.gb_max_depth = 3
@@ -24,7 +22,6 @@ class GradientBoosting:
         self.gb_subsample = 1.0
         self.gb_max_features = None
         
-        # Inicializar clasificador con parámetros optimizados
         self.gb_classifier = GradientBoostingClassifier(
             n_estimators=self.gb_n_estimators,
             learning_rate=self.gb_learning_rate,
@@ -37,7 +34,7 @@ class GradientBoosting:
             verbose=0
         )
         
-        # Distribuciones de parámetros para búsqueda aleatoria
+        # Define search space for RandomizedSearchCV
         self.param_distributions = {
             'n_estimators': randint(50, 300),
             'learning_rate': uniform(0.01, 0.3),
@@ -50,45 +47,42 @@ class GradientBoosting:
                       
     def train_gb_binary(self, X, y):  
         """
-        Entrena el modelo de clasificación Gradient Boosting con opciones para manejar desbalance de clases.
+        Trains a binary classifier and saves the result.
         
+        Performs stratified splitting, cross-validation, and ROC/PR calculation.
+        Saves the model artifact using `utils.save_model`.
+
         Args:
-            X: Features
-            y: Variable objetivo
+            X (pd.DataFrame): Input features.
+            y (pd.Series): Binary target variable.
             
         Returns:
-            Diccionario con resultados del entrenamiento
+            dict: Performance metrics (AUC, F1, Accuracy), reports, and test data.
         """
         mode = 'binario'
         print("Entrenando modelo Gradient Boosting...")
         
-        
-        # División del dataset con estratificación
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        # Entrenamiento del modelo
         self.gb_classifier.fit(X_train, y_train)
         
-        # Evaluación
+        # Run inference
         y_pred = self.gb_classifier.predict(X_test)
         y_prob = self.gb_classifier.predict_proba(X_test)[:, 1]
         
-        # Validación cruzada
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         cv_scores = cross_val_score(
             self.gb_classifier, X, y, cv=cv, scoring='roc_auc'
         )
 
-        # Calcular curva ROC
+        # Calculate threshold metrics
         fpr, tpr, _ = roc_curve(y_test, y_prob)
         roc_auc = auc(fpr, tpr)
         
-        # Calcular curva PR
         precision, recall, _ = precision_recall_curve(y_test, y_prob)
         pr_auc = average_precision_score(y_test, y_prob)
-        
         
         model = {
             'features': X.columns.tolist(),
@@ -96,10 +90,10 @@ class GradientBoosting:
             'model_name': 'GradientBoosting',
             'classification_type': mode
         }
-        save_model(model, mode, GB_MODELS_DIR, GB_MODEL_FILENAME,
-                   precision_score(y_test, y_pred),recall_score(y_test, y_pred),
-                   f1_score(y_test, y_pred),roc_auc)
         
+        save_model(model, mode, GB_MODELS_DIR, GB_MODEL_FILENAME,
+                   precision_score(y_test, y_pred), recall_score(y_test, y_pred),
+                   f1_score(y_test, y_pred), roc_auc)
         
         return {
             'cv_scores': cv_scores,
@@ -111,8 +105,7 @@ class GradientBoosting:
             'pr_auc': pr_auc,
             'classification_report': classification_report(y_test, y_pred),
             'confusion_matrix': confusion_matrix(y_test, y_pred),
-            'test_data': ( y_test, y_prob),
-            # 'scaler': scaler,
+            'test_data': (y_test, y_prob),
             'roc_curve': (fpr, tpr),
             'pr_curve': (precision, recall),
             'feature_importance': self.gb_classifier.feature_importances_
@@ -120,38 +113,33 @@ class GradientBoosting:
     
     def train_gb_multiclase(self, X, y):  
         """
-        Entrena el modelo de clasificación Gradient Boosting multiclase con opciones para manejar desbalance de clases.
+        Trains a multi-class classifier.
+        
+        Evaluates metrics using a One-vs-Rest (OvR) strategy.
         
         Args:
-            X: Features
-            y: Variable objetivo
+            X (pd.DataFrame): Input features.
+            y (pd.Series): Multi-class target variable.
 
-            
         Returns:
-            Diccionario con resultados del entrenamiento
+            dict: Aggregated metrics (macro-average), OvR AUC, and confusion matrix.
         """
         print("Entrenando modelo Gradient Boosting Multiclase...")
         
-        # División del dataset con estratificación
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        
-        # Entrenamiento del modelo
         self.gb_classifier.fit(X_train, y_train)
         
-        # Evaluación
         y_pred = self.gb_classifier.predict(X_test)
         y_prob = self.gb_classifier.predict_proba(X_test)
         
-        # Validación cruzada con métrica adecuada para multiclase
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         cv_scores = cross_val_score(
             self.gb_classifier, X, y, cv=cv, scoring='accuracy'
         )
         
-        # Calcular AUC para multiclase
         roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr', average='macro')
         
         return {
@@ -169,20 +157,21 @@ class GradientBoosting:
        
     def optimize_gb_hyperparameters(self, X, y, n_iter=50, cv_folds=5):
         """
-        Optimiza los hiperparámetros del modelo Gradient Boosting usando RandomizedSearchCV.
+        Optimizes hyperparameters using RandomizedSearchCV.
+        
+        Updates the internal `self.gb_classifier` with the best estimator found.
         
         Args:
-            X: Features
-            y: Variable objetivo
-            n_iter: Número de iteraciones para la búsqueda aleatoria
-            cv_folds: Número de folds para validación cruzada
+            X (pd.DataFrame): Input features.
+            y (pd.Series): Target variable.
+            n_iter (int): Number of search iterations. Default: 50.
+            cv_folds (int): Number of cross-validation folds. Default: 5.
             
         Returns:
-            Mejores parámetros encontrados
+            dict: The best hyperparameters found.
         """
         print(f"Optimizando hiperparámetros de Gradient Boosting con {n_iter} iteraciones...")
         
-        # Configurar búsqueda aleatoria
         random_search = RandomizedSearchCV(
             estimator=self.gb_classifier,
             param_distributions=self.param_distributions,
@@ -194,16 +183,14 @@ class GradientBoosting:
             verbose=1
         )
         
-        # Realizar búsqueda
         random_search.fit(X, y)
         
-        # Actualizar clasificador con mejores parámetros
         self.gb_classifier = random_search.best_estimator_
         
-        print(f"\n🎯 MEJORES PARÁMETROS ENCONTRADOS:")
+        print(f"\nMEJORES PARÁMETROS ENCONTRADOS:")
         for param, value in random_search.best_params_.items():
             print(f"  {param}: {value}")
         
-        print(f"\n📊 MEJOR PUNTUACIÓN CV: {random_search.best_score_:.4f}")
+        print(f"\nMEJOR PUNTUACIÓN CV: {random_search.best_score_:.4f}")
         
         return random_search.best_params_

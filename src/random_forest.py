@@ -1,6 +1,3 @@
-"""
-Módulo para la construcción y entrenamiento de modelos Random Forest
-"""
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
@@ -10,13 +7,14 @@ from config import RF_MODEL_FILENAME, RF_MODELS_DIR
 from utils import save_model
         
 class RandomForest:
+    """
+    Manages RandomForestClassifier configuration, training, and optimization.
+    
+    Handles default hyperparameter setup and cross-validation strategies.
+    """
     
     def __init__(self):
-        # Parámetros optimizados para Random Forest
-        """
-        Configuración optimizada para Random Forest basada en mejores prácticas
-        """
-        
+        # Set default hyperparameters
         self.rf_n_estimators = 100
         self.rf_max_depth = None
         self.rf_min_samples_split = 2
@@ -25,7 +23,7 @@ class RandomForest:
         self.rf_bootstrap = True
         self.rf_class_weight = 'balanced'
         
-        # Inicializar clasificador con parámetros optimizados
+        # Initialize estimator
         self.rf_classifier = RandomForestClassifier(
             n_estimators=self.rf_n_estimators,
             max_depth=self.rf_max_depth,
@@ -35,10 +33,10 @@ class RandomForest:
             bootstrap=self.rf_bootstrap,
             class_weight=self.rf_class_weight,
             random_state=42,
-            n_jobs=-1  # Usar todos los núcleos disponibles
+            n_jobs=-1 
         )
         
-        # Distribuciones de parámetros para búsqueda aleatoria
+        # Define search space for RandomizedSearchCV
         self.param_distributions = {
             'n_estimators': randint(50, 300),
             'max_depth': [None, 10, 20, 30, 40, 50],
@@ -51,48 +49,46 @@ class RandomForest:
                   
     def train_rf_binary(self, X, y):  
         """
-        Entrena el modelo de clasificación Random Forest con opciones para manejar desbalance de clases.
+        Trains a binary classifier and saves the result.
         
+        Performs stratified splitting, cross-validation, and ROC/PR calculation.
+        Saves the model artifact using `utils.save_model`.
+
         Args:
-            X: Features
-            y: Variable objetivo
+            X (pd.DataFrame): Input features.
+            y (pd.Series): Binary target variable.
             
         Returns:
-            Diccionario con resultados del entrenamiento
+            dict: Performance metrics (AUC, F1, Accuracy), reports, and test data.
         """
         mode = 'binario'
-        
-        
         print("Entrenando modelo Random Forest...")
         
-        # División del dataset con estratificación
+        # Stratified split
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        
-        # Entrenamiento del modelo
         self.rf_classifier.fit(X_train, y_train)
         
-        # Evaluación
+        # Run inference
         y_pred = self.rf_classifier.predict(X_test)
         y_prob = self.rf_classifier.predict_proba(X_test)[:, 1]
         
-        # Validación cruzada
+        # Cross-validation
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         cv_scores = cross_val_score(
             self.rf_classifier, X, y, cv=cv, scoring='roc_auc'
         )
 
-        # Calcular curva ROC
+        # Calculate threshold metrics
         fpr, tpr, _ = roc_curve(y_test, y_prob)
         roc_auc = auc(fpr, tpr)
         
-        # Calcular curva PR
         precision, recall, _ = precision_recall_curve(y_test, y_prob)
         pr_auc = average_precision_score(y_test, y_prob)
         
-        
+        # Save model artifact
         model = {
             'features': X.columns.tolist(),
             'trained_model': self.rf_classifier,
@@ -100,8 +96,8 @@ class RandomForest:
             'classification_type': mode
         }
         save_model(model, mode, RF_MODELS_DIR, RF_MODEL_FILENAME,
-                   precision_score(y_test, y_pred),recall_score(y_test, y_pred),
-                   f1_score(y_test, y_pred),roc_auc)
+                   precision_score(y_test, y_pred), recall_score(y_test, y_pred),
+                   f1_score(y_test, y_pred), roc_auc)
 
         return {
             'cv_scores': cv_scores,
@@ -114,7 +110,6 @@ class RandomForest:
             'classification_report': classification_report(y_test, y_pred),
             'confusion_matrix': confusion_matrix(y_test, y_pred),
             'test_data': (y_test, y_prob),
-            # 'scaler': scaler,
             'roc_curve': (fpr, tpr),
             'pr_curve': (precision, recall),
             'feature_importance': self.rf_classifier.feature_importances_
@@ -122,36 +117,34 @@ class RandomForest:
     
     def train_rf_multiclase(self, X, y):  
         """
-        Entrena el modelo de clasificación Random Forest multiclase con opciones para manejar desbalance de clases.
+        Trains a multi-class classifier.
+        
+        Evaluates metrics using a One-vs-Rest (OvR) strategy.
         
         Args:
-            X: Features
-            y: Variable objetivo
+            X (pd.DataFrame): Input features.
+            y (pd.Series): Multi-class target variable.
             
         Returns:
-            Diccionario con resultados del entrenamiento
+            dict: Aggregated metrics (macro-average), OvR AUC, and confusion matrix.
         """
         print("Entrenando modelo Random Forest Multiclase...")
         
-        # División del dataset con estratificación
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
-        # Entrenamiento del modelo
         self.rf_classifier.fit(X_train, y_train)
         
-        # Evaluación
         y_pred = self.rf_classifier.predict(X_test)
         y_prob = self.rf_classifier.predict_proba(X_test)
         
-        # Validación cruzada con métrica adecuada para multiclase
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         cv_scores = cross_val_score(
             self.rf_classifier, X, y, cv=cv, scoring='accuracy'
         )
         
-        # Calcular AUC para multiclase
+        # Calculate Multiclass AUC (One-vs-Rest)
         roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr', average='macro')
         
         return {
@@ -166,4 +159,3 @@ class RandomForest:
             'test_data': (X_test, y_test, y_pred, y_prob),
             'feature_importance': self.rf_classifier.feature_importances_
         }
-
